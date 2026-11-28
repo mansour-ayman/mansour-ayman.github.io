@@ -470,7 +470,7 @@ dialog.player::backdrop{background:rgba(8,8,9,.94)}
 <footer>
   <div class="wrap">
     <span><span class="logo" style="color:#fff">Mansour<i>.</i>motion</span> · إعلانات فيديو للأزياء والمتاجر</span>
-    <span><a href="privacy.html">سياسة الخصوصية</a> · <a href="https://www.instagram.com/mansour.motion/" target="_blank" rel="noopener">إنستجرام</a> · <a href="https://www.tiktok.com/@mansour.motion" target="_blank" rel="noopener">تيك توك</a> ·<a href="../en/" lang="en">English</a></span>
+    <span><a href="privacy.html">سياسة الخصوصية</a> · <a href="https://www.instagram.com/mansour.motion/" target="_blank" rel="noopener">إنستجرام</a> · <a href="https://www.tiktok.com/@mansour.motion" target="_blank" rel="noopener">تيك توك</a> · <a href="https://www.snapchat.com/add/mansour.ayman2" target="_blank" rel="noopener">سناب شات</a> · <a href="../en/" lang="en">English</a></span>
   </div>
 </footer>
 
@@ -500,6 +500,7 @@ const CONFIG = {
   ga4: "G-B8SKQ9HHPZ",            // Google Analytics 4 (حساب Mansour motion)
   metaPixel: "",                  // Meta Pixel ID: أرقام فقط
   tiktokPixel: "DC5E1GJC77U703IGQJEG",              // TikTok Pixel ID
+  snapPixel: "223a7a47-b41e-4d8f-88e1-5d10d3236b9c",                // Snap Pixel ID
   clarity: ""                     // Microsoft Clarity project ID (خريطة حرارية + تسجيلات للزيارات)
 };
 /* ===================================================================== */
@@ -533,11 +534,13 @@ document.querySelectorAll("[data-wa]").forEach(a => {
 let trackingOn = false;
 const META = { view_work: "ViewContent", form_start: "InitiateCheckout", generate_lead: "Lead", contact: "Contact", select_package: "AddToCart" };
 const TIKTOK = { view_work: "ViewContent", form_start: "InitiateCheckout", generate_lead: "SubmitForm", contact: "Contact", select_package: "AddToCart" };
+const SNAP = { view_work: "VIEW_CONTENT", form_start: "START_CHECKOUT", generate_lead: "SIGN_UP", contact: "CUSTOM_EVENT_1", select_package: "ADD_CART" };
 function track(event, params = {}) {
   if (!trackingOn) return;
   if (window.gtag) gtag("event", event, params);
   if (window.fbq) META[event] ? fbq("track", META[event], params) : fbq("trackCustom", event, params);
   if (window.ttq && TIKTOK[event]) ttq.track(TIKTOK[event], params);
+  if (window.snaptr && SNAP[event]) snaptr("track", SNAP[event]);
   if (window.clarity) clarity("event", event);
 }
 function loadScript(src) { const s = document.createElement("script"); s.async = true; s.src = src; document.head.appendChild(s); }
@@ -558,8 +561,12 @@ function startTracking() {
   if (CONFIG.tiktokPixel) {
     !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.load=function(e){var n="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._t=ttq._t||{};ttq._t[e]=+new Date;var o=d.createElement("script");o.async=!0;o.src=n+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(CONFIG.tiktokPixel);ttq.page();}(window,document,"ttq");
   }
+  if (CONFIG.snapPixel) {
+    (function(e,t,n){if(e.snaptr)return;var a=e.snaptr=function(){a.handleRequest?a.handleRequest.apply(a,arguments):a.queue.push(arguments)};a.queue=[];var s="script",r=t.createElement(s);r.async=!0;r.src=n;var u=t.getElementsByTagName(s)[0];u.parentNode.insertBefore(r,u);})(window,document,"https://sc-static.net/scevent.min.js");
+    snaptr("init", CONFIG.snapPixel); snaptr("track", "PAGE_VIEW");
+  }
 }
-const hasTracking = CONFIG.ga4 || CONFIG.metaPixel || CONFIG.tiktokPixel || CONFIG.clarity;
+const hasTracking = CONFIG.ga4 || CONFIG.metaPixel || CONFIG.tiktokPixel || CONFIG.snapPixel || CONFIG.clarity;
 let choice = null; try { choice = localStorage.getItem("consent"); } catch (e) {}
 if (hasTracking) {
   if (choice === "yes") startTracking();
