@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>قيّم تجربتك | Mansour.motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;600&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0b0b0c;color:#fff;font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;line-height:1.8;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:560px;background:#151518;border:1px solid #26262c;border-radius:20px;padding:36px 28px}
+.brand{font-family:"Alexandria",sans-serif;color:#2d5bff;font-weight:800;letter-spacing:.02em;margin:0 0 1.2rem;direction:ltr;text-align:right}
+h1{font-family:"Alexandria",sans-serif;font-size:1.9rem;line-height:1.5;margin:0 0 .6rem}
+.sub{color:#b9b9c2;margin:0 0 2rem}
+label{display:block;font-weight:600;margin:1.2rem 0 .45rem}
+input,textarea{width:100%;background:#0b0b0c;border:1px solid #2e2e36;border-radius:12px;color:#fff;font:inherit;padding:12px 14px}
+input:focus,textarea:focus{outline:2px solid #2d5bff;border-color:transparent}
+textarea{min-height:130px;resize:vertical}
+.stars{display:flex;gap:6px;direction:rtl}
+.stars button{background:none;border:0;cursor:pointer;font-size:2.3rem;line-height:1;color:#3a3a44;padding:2px;transition:color .15s,transform .15s}
+.stars button.on{color:#ffc43d}
+.stars button:hover{transform:scale(1.12)}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;color:#b9b9c2;font-size:.95rem}
+.check input{width:auto;margin-top:.4rem}
+.btn{margin-top:1.8rem;width:100%;background:#2d5bff;color:#fff;border:0;border-radius:12px;font:700 1.1rem "Alexandria",sans-serif;padding:15px;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:wait}
+.err{color:#ff6b6b;min-height:1.6em;margin:.6rem 0 0;font-size:.95rem}
+.done{text-align:center}
+.done .big{font-size:3rem;color:#2d5bff;font-family:"Alexandria",sans-serif}
+.done a{color:#2d5bff}
+.opt{color:#7d7d88;font-weight:400;font-size:.9rem}
+</style>
+</head>
+<body>
+<main class="card">
+  <p class="brand">Mansour.motion</p>
+
+  <form id="f" novalidate>
+    <h1>رأيك يهمّني</h1>
+    <p class="sub">شكرًا إنك اشتغلت معي. اكتب رأيك بصراحة عن الإعلان والتعامل، وبيساعدني أطوّر شغلي ويساعد أصحاب المتاجر الثانيين.</p>
+
+    <label>تقييمك العام</label>
+    <div class="stars" id="stars" role="radiogroup" aria-label="التقييم من 1 إلى 5">
+      <button type="button" data-v="1" aria-label="نجمة واحدة">★</button>
+      <button type="button" data-v="2" aria-label="نجمتين">★</button>
+      <button type="button" data-v="3" aria-label="3 نجوم">★</button>
+      <button type="button" data-v="4" aria-label="4 نجوم">★</button>
+      <button type="button" data-v="5" aria-label="5 نجوم">★</button>
+    </div>
+
+    <label for="text">رأيك في الشغل</label>
+    <textarea id="text" maxlength="600" placeholder="مثلاً: الإعلان طلع زي ما تخيلته، والتسليم كان في الوقت…"></textarea>
+
+    <label for="name">اسمك <span class="opt">(يظهر مع رأيك)</span></label>
+    <input id="name" maxlength="80" autocomplete="name">
+
+    <label for="store">اسم المتجر أو البراند <span class="opt">(اختياري)</span></label>
+    <input id="store" maxlength="80">
+
+    <label class="check"><input type="checkbox" id="ok"> أوافق إن رأيي واسمي ينعرضوا في موقع Mansour.motion</label>
+
+    <button class="btn" id="send" type="submit">إرسال التقييم</button>
+    <p class="err" id="err" aria-live="polite"></p>
+  </form>
+
+  <div class="done" id="done" hidden>
+    <div class="big">✓</div>
+    <h1>وصلني رأيك، شكرًا لك</h1>
+    <p class="sub">بقراه بنفسي، وبيظهر في الموقع بعد المراجعة.</p>
+    <a href="./">الرجوع للموقع</a>
+  </div>
+</main>
+
+<script>
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbwYVlsOxOYI8RSNg316yjGRn6a_pl_c8Ma_IDC1JU_EyHMGZiz_8nyTRR7Ey9fCchC-/exec";
+let rating = 0;
+const stars = [...document.querySelectorAll("#stars button")];
+const paint = n => stars.forEach(b => b.classList.toggle("on", +b.dataset.v <= n));
+stars.forEach(b => {
+  b.addEventListener("click", () => { rating = +b.dataset.v; paint(rating); });
+  b.addEventListener("mouseenter", () => paint(+b.dataset.v));
+});
+document.getElementById("stars").addEventListener("mouseleave", () => paint(rating));
+
+document.getElementById("f").addEventListener("submit", async e => {
+  e.preventDefault();
+  const v = id => document.getElementById(id).value.trim();
+  const err = document.getElementById("err");
+  if (!rating) return err.textContent = "اختار عدد النجوم أول.";
+  if (v("text").length < 5) return err.textContent = "اكتب رأيك في سطر على الأقل.";
+  if (!v("name")) return err.textContent = "اكتب اسمك.";
+  if (!document.getElementById("ok").checked) return err.textContent = "لازم توافق على عرض رأيك عشان نقدر ننشره.";
+  err.textContent = "";
+  const btn = document.getElementById("send");
+  btn.disabled = true; btn.textContent = "جاري الإرسال…";
+  try {
+    await fetch(SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ type: "review", name: v("name"), store: v("store"), rating, text: v("text") }) });
+    document.getElementById("f").hidden = true;
+    document.getElementById("done").hidden = false;
+  } catch (_) {
+    btn.disabled = false; btn.textContent = "إرسال التقييم";
+    err.textContent = "حصلت مشكلة في الاتصال. جرّب مرة ثانية.";
+  }
+});
+</script>
+</body>
+</html>
